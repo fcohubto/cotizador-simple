@@ -1,0 +1,13 @@
+{
+  "name": "Cotizador Simple",
+  "short_name": "Cotizador",
+  "description": "Arma tus recetas y cotiza tus productos.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#14120E",
+  "theme_color": "#F2B84B",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

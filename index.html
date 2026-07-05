@@ -4,377 +4,955 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cotizador Simple</title>
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.svg">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#F2B84B">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Cotizador">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0,0" rel="stylesheet">
 <style>
   :root{
-    --bg: #0D0B09;
-    --panel: #17140F;
-    --border: #2A241C;
-    --text: #EDE8DF;
-    --text-muted: #9A948C;
-    --accent: #C9A15A;
-    --danger: #B5544A;
-    --radius: 10px;
+    /* Material 3 — color roles (dark scheme, seed cálido para evitar el azul-negro genérico) */
+    --md-primary: #F2B84B;
+    --md-on-primary: #402D00;
+    --md-primary-container: #5C4300;
+    --md-on-primary-container: #FFDDA1;
+
+    --md-secondary-container: #52442C;
+    --md-on-secondary-container: #F5DFC0;
+
+    --md-tertiary-container: #33492C;
+    --md-on-tertiary-container: #C4E6B3;
+    --md-error: #FFB4AB;
+
+    --md-surface: #14120E;
+    --md-surface-container-lowest: #0A0908;
+    --md-surface-container-low: #1C1912;
+    --md-surface-container: #201D16;
+    --md-surface-container-high: #2B271E;
+    --md-surface-container-highest: #363228;
+    --md-on-surface: #EAE1D5;
+    --md-on-surface-variant: #CDC5B4;
+    --md-outline: #96917F;
+    --md-outline-variant: #4B4739;
+
+    /* Shape scale */
+    --shape-xs: 4px;
+    --shape-sm: 8px;
+    --shape-md: 12px;
+    --shape-lg: 16px;
+    --shape-xl: 28px;
+    --shape-full: 999px;
+
+    /* Espaciado — escala 8dp (Material) sobre grilla de 4px */
+    --sp-1: 4px;
+    --sp-2: 8px;
+    --sp-3: 12px;
+    --sp-4: 16px;
+    --sp-5: 24px;
+
+    /* Tipografía — mínimo 14px visible en pantalla */
+    --text-base: 0.875rem;
+    --text-md: 1rem;
+    --text-lg: 1.125rem;
+    --text-xl: 1.5rem;
+    --text-2xl: 1.75rem;
+    --text-3xl: 2.25rem;
+
+    --motion-fast: 150ms;
+    --motion-base: 250ms;
+    --motion-easing: cubic-bezier(0.2, 0, 0, 1);
+
+    --nav-height: 64px;
   }
   *{ box-sizing: border-box; }
   body{
     margin:0;
-    background: var(--bg);
-    color: var(--text);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--md-surface);
+    color: var(--md-on-surface);
+    font-family: 'Roboto', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     font-size: 16px;
     line-height: 1.5;
   }
-  .wrap{
+  .material-symbols-outlined{
+    font-variation-settings: 'opsz' 24, 'wght' 400, 'FILL' 0, 'GRAD' 0;
+    font-size: 22px;
+    line-height: 1;
+  }
+  .app{
     max-width: 720px;
     margin: 0 auto;
-    padding: 32px 20px 80px;
+    padding: 0 var(--sp-5) calc(var(--nav-height) + 96px);
   }
-  header{
-    margin-bottom: 32px;
+  .top-app-bar{
+    padding: var(--sp-5) 0 var(--sp-3);
   }
-  h1{
-    font-size: 24px;
-    font-weight: 600;
-    margin: 0 0 6px;
+  .top-app-bar h1{
+    font-size: var(--text-2xl);
+    font-weight: 700;
+    margin: 0 0 4px;
   }
-  header p{
-    color: var(--text-muted);
+  .top-app-bar p{
+    color: var(--md-on-surface-variant);
     margin: 0;
-    font-size: 14px;
+    font-size: var(--text-md);
+  }
+  .view{ display: none; }
+  .view.active{ display: block; }
+  .view-header{ margin-bottom: var(--sp-5); }
+  .view-header h2{
+    font-size: var(--text-xl);
+    font-weight: 700;
+    margin: 0;
   }
   .card{
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 20px;
-    margin-bottom: 20px;
+    background: var(--md-surface-container);
+    border-radius: var(--shape-lg);
+    padding: var(--sp-5);
+    margin-bottom: var(--sp-4);
   }
-  .card h2{
-    font-size: 16px;
-    font-weight: 600;
-    margin: 0 0 16px;
+  .card h3{
+    font-size: var(--text-xl);
+    font-weight: 700;
+    margin: 0 0 var(--sp-5);
   }
   label{
     display:block;
-    font-size: 14px;
-    color: var(--text-muted);
-    margin-bottom: 6px;
+    font-size: var(--text-base);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--md-on-surface-variant);
+    margin-bottom: var(--sp-1);
   }
-  input[type="text"], input[type="number"]{
-    width: 100%;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    color: var(--text);
-    padding: 10px 12px;
-    font-size: 14px;
-    font-family: inherit;
+  .section-label{
+    display: block;
+    font-size: var(--text-md);
+    font-weight: 700;
+    text-transform: none;
+    letter-spacing: normal;
+    color: var(--md-on-surface);
+    margin: 0 0 var(--sp-3);
   }
-  input:focus{
-    outline: none;
-    border-color: var(--accent);
-  }
-  .field{ margin-bottom: 14px; }
-  .ingrediente-row{
+  .ing-row-header{
     display: grid;
-    grid-template-columns: 1fr 90px 110px 32px;
-    gap: 8px;
-    margin-bottom: 10px;
-    align-items: end;
+    grid-template-columns: 1fr 80px 90px 44px;
+    gap: var(--sp-2);
+    font-size: var(--text-base);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--md-on-surface-variant);
+    margin-bottom: var(--sp-2);
   }
-  .ingrediente-row label{ margin-bottom: 4px; }
+  @media (max-width: 480px){
+    .ing-row-header{ display: none; }
+  }
+  .badge{
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--md-tertiary-container);
+    color: var(--md-on-tertiary-container);
+    border-radius: var(--shape-full);
+    padding: var(--sp-1) var(--sp-3);
+    font-size: var(--text-base);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .item-meta{
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--sp-2);
+    margin-top: var(--sp-2);
+  }
+  .item-adicional{
+    font-size: var(--text-base);
+    color: var(--md-on-surface-variant);
+  }
+  input[type="text"], input[type="number"], select{
+    width: 100%;
+    background: var(--md-surface-container-highest);
+    border: none;
+    border-bottom: 1px solid var(--md-outline);
+    border-radius: var(--shape-xs) var(--shape-xs) 0 0;
+    color: var(--md-on-surface);
+    padding: var(--sp-3) var(--sp-4);
+    font-size: var(--text-base);
+    font-family: inherit;
+    min-height: 44px;
+    transition: border-color var(--motion-fast) var(--motion-easing), background var(--motion-fast) var(--motion-easing);
+  }
+  input:focus, select:focus{
+    outline: none;
+    border-bottom: 2px solid var(--md-primary);
+    background: var(--md-surface-container-high);
+    padding-bottom: calc(var(--sp-3) - 1px);
+  }
+  .field{ margin-bottom: var(--sp-4); }
   .btn{
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid var(--border);
-    background: transparent;
-    color: var(--text);
-    border-radius: 8px;
-    padding: 10px 16px;
-    font-size: 14px;
+    gap: 8px;
+    border: none;
+    background: var(--md-surface-container-high);
+    color: var(--md-on-surface);
+    border-radius: var(--shape-full);
+    padding: var(--sp-2) var(--sp-5);
+    font-size: var(--text-base);
+    font-weight: 500;
     cursor: pointer;
     font-family: inherit;
+    min-height: 44px;
+    transition: background var(--motion-fast) var(--motion-easing), transform var(--motion-fast) var(--motion-easing);
   }
-  .btn:hover{ border-color: var(--accent); }
+  .btn:hover{ background: var(--md-surface-container-highest); }
+  .btn:active{ transform: scale(0.97); }
   .btn-primary{
-    background: var(--accent);
-    border-color: var(--accent);
-    color: #17140F;
+    background: var(--md-primary);
+    color: var(--md-on-primary);
     font-weight: 600;
   }
-  .btn-primary:hover{ opacity: 0.9; }
+  .btn-primary:hover{ opacity: 0.92; }
+  .btn-tonal{
+    background: var(--md-secondary-container);
+    color: var(--md-on-secondary-container);
+  }
+  .btn-text{
+    background: transparent;
+    color: var(--md-primary);
+  }
+  .btn-text:hover{ background: rgba(242, 184, 75, 0.1); }
+  .btn-text-danger{
+    background: transparent;
+    color: var(--md-error);
+  }
+  .btn-text-danger:hover{ background: rgba(255, 180, 171, 0.1); }
   .btn-remove{
-    color: var(--danger);
+    color: var(--md-on-surface-variant);
     border: none;
     background: transparent;
-    font-size: 18px;
     cursor: pointer;
-    padding: 8px;
+    width: 44px;
+    height: 44px;
+    border-radius: var(--shape-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background var(--motion-fast) var(--motion-easing), color var(--motion-fast) var(--motion-easing);
   }
-  .btn-add-ingrediente{
+  .btn-remove:hover{ background: var(--md-surface-container-highest); color: var(--md-error); }
+  .btn-add-row{
     width: 100%;
-    margin-bottom: 16px;
+    margin: var(--sp-4) 0 var(--sp-5);
+  }
+  .receta-ing-row{
+    display: grid;
+    grid-template-columns: 1fr 80px 90px 44px;
+    gap: var(--sp-2);
+    margin-bottom: var(--sp-3);
+    align-items: center;
+  }
+  .subtotal-display{
+    font-size: var(--text-base);
+    color: var(--md-on-surface-variant);
+    padding: var(--sp-3) 0;
+  }
+  @media (max-width: 480px){
+    .receta-ing-row{
+      grid-template-columns: 1fr 1fr 44px;
+      grid-template-areas: "select select remove" "cantidad subtotal remove";
+      row-gap: var(--sp-2);
+    }
+    .rec-ing-select{ grid-area: select; }
+    .rec-ing-cantidad{ grid-area: cantidad; }
+    .rec-ing-subtotal{ grid-area: subtotal; align-self: center; }
+    .btn-remove{ grid-area: remove; align-self: center; justify-self: center; }
   }
   .resumen{
-    border-top: 1px solid var(--border);
-    padding-top: 16px;
-    margin-top: 16px;
+    border-top: 1px solid var(--md-outline-variant);
+    padding-top: var(--sp-4);
+    margin-top: var(--sp-4);
   }
   .resumen-row{
     display: flex;
     justify-content: space-between;
-    font-size: 14px;
-    color: var(--text-muted);
-    margin-bottom: 8px;
+    align-items: center;
+    font-size: var(--text-md);
+    color: var(--md-on-surface-variant);
+    margin-bottom: var(--sp-2);
   }
   .resumen-row.final{
-    font-size: 18px;
-    color: var(--text);
-    font-weight: 600;
-    margin-top: 8px;
+    font-size: var(--text-3xl);
+    color: var(--md-primary);
+    font-weight: 700;
+    margin-top: var(--sp-3);
   }
   .acciones{
     display: flex;
-    gap: 10px;
-    margin-top: 16px;
+    gap: var(--sp-3);
+    margin-top: var(--sp-5);
   }
   .acciones .btn{ flex: 1; }
-  .productos-list{
+  .list{
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: var(--sp-2);
   }
-  .producto-item{
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 16px 20px;
+  .list-item{
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: var(--sp-4);
+    background: var(--md-surface-container);
+    border: none;
+    border-radius: var(--shape-lg);
+    padding: var(--sp-3) var(--sp-4);
+    font: inherit;
+    text-align: left;
+    color: inherit;
+    cursor: pointer;
+    transition: background var(--motion-fast) var(--motion-easing);
   }
-  .producto-header{
+  .list-item:hover{ background: var(--md-surface-container-high); }
+  .list-item:active{ background: var(--md-surface-container-highest); }
+  .list-icon{
+    width: 40px;
+    height: 40px;
+    border-radius: var(--shape-md);
+    background: var(--md-secondary-container);
+    color: var(--md-on-secondary-container);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 20px;
+    line-height: 1;
+  }
+  .list-body{ flex: 1; min-width: 0; }
+  .item-header{
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: var(--sp-3);
   }
-  .producto-nombre{
-    font-size: 16px;
-    font-weight: 600;
+  .item-nombre{
+    font-size: var(--text-lg);
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
-  .producto-precio{
-    font-size: 18px;
-    font-weight: 600;
-    color: var(--accent);
+  .item-valor{
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: var(--md-primary);
+    white-space: nowrap;
   }
-  .producto-detalle{
-    color: var(--text-muted);
-    font-size: 14px;
-    margin-top: 6px;
+  .item-detalle{
+    color: var(--md-on-surface-variant);
+    font-size: var(--text-base);
+    margin-top: 4px;
   }
-  .producto-actions{
-    margin-top: 12px;
-    display: flex;
-    gap: 8px;
+  .item-warning{
+    color: var(--md-error);
+    font-size: var(--text-base);
+    margin-top: 4px;
   }
   .empty{
-    color: var(--text-muted);
-    font-size: 14px;
+    color: var(--md-on-surface-variant);
+    font-size: var(--text-base);
     text-align: center;
-    padding: 20px 0;
+    padding: var(--sp-5) 0;
   }
+  .empty-block{
+    text-align: center;
+    padding: var(--sp-5) 0;
+  }
+  .empty-block p{
+    color: var(--md-on-surface-variant);
+    font-size: var(--text-base);
+    margin: 0 0 var(--sp-4);
+  }
+  .fab{
+    position: fixed;
+    right: max(var(--sp-5), calc(50vw - 336px));
+    bottom: calc(var(--nav-height) + var(--sp-4));
+    width: 56px;
+    height: 56px;
+    border-radius: var(--shape-lg);
+    background: var(--md-primary-container);
+    color: var(--md-on-primary-container);
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.35), 0 1px 3px rgba(0,0,0,0.3);
+    cursor: pointer;
+    transition: background var(--motion-fast) var(--motion-easing), color var(--motion-fast) var(--motion-easing), transform var(--motion-fast) var(--motion-easing);
+    z-index: 20;
+  }
+  .fab:hover{ background: var(--md-primary); color: var(--md-on-primary); }
+  .fab:active{ transform: scale(0.94); }
+  .fab .material-symbols-outlined{ font-size: 26px; }
+  .nav-bar{
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: var(--nav-height);
+    background: var(--md-surface-container);
+    border-top: 1px solid var(--md-outline-variant);
+    z-index: 10;
+  }
+  .nav-bar-inner{
+    max-width: 720px;
+    margin: 0 auto;
+    height: 100%;
+    display: flex;
+  }
+  .nav-item{
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    color: var(--md-on-surface-variant);
+    padding: var(--sp-2) 0;
+  }
+  .nav-indicator{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 28px;
+    border-radius: var(--shape-full);
+    transition: background var(--motion-base) var(--motion-easing);
+  }
+  .nav-item.active .nav-indicator{ background: var(--md-secondary-container); }
+  .nav-item.active .nav-indicator .material-symbols-outlined{ color: var(--md-on-secondary-container); }
+  .nav-item.active{ color: var(--md-on-surface); }
+  .nav-item .material-symbols-outlined{ font-size: 22px; }
+  .nav-label{
+    font-size: var(--text-base);
+    font-weight: 500;
+  }
+  .nav-item.active .nav-label{ font-weight: 700; }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header>
+<div class="app">
+  <header class="top-app-bar">
     <h1>Cotizador Simple</h1>
-    <p>Calcula el precio final de tus productos según sus ingredientes.</p>
+    <p>Arma tus recetas y cotiza tus productos.</p>
   </header>
 
-  <div class="card">
-    <h2>Nuevo producto</h2>
-    <div class="field">
-      <label for="nombreProducto">Nombre del producto</label>
-      <input type="text" id="nombreProducto" placeholder="Ej: Torta de chocolate">
+  <main>
+    <!-- VISTA: PRODUCTOS -->
+    <div id="view-productos" class="view active">
+      <div class="view-header"><h2>Mis productos</h2></div>
+      <div id="productosContent"></div>
     </div>
 
-    <label>Ingredientes</label>
-    <div id="ingredientesContainer"></div>
-    <button class="btn btn-add-ingrediente" onclick="agregarFilaIngrediente()">+ Agregar ingrediente</button>
-
-    <div class="field">
-      <label for="valorAdicional">Valor adicional (mano de obra, utilidad, etc.)</label>
-      <input type="number" id="valorAdicional" placeholder="0" min="0" oninput="actualizarResumen()">
+    <!-- VISTA: RECETAS -->
+    <div id="view-recetas" class="view">
+      <div class="view-header"><h2>Mis recetas</h2></div>
+      <div id="recetasContent"></div>
     </div>
 
-    <div class="resumen">
-      <div class="resumen-row">
-        <span>Costo ingredientes</span>
-        <span id="costoIngredientes">$0</span>
-      </div>
-      <div class="resumen-row">
-        <span>Valor adicional</span>
-        <span id="valorAdicionalResumen">$0</span>
-      </div>
-      <div class="resumen-row final">
-        <span>Valor final</span>
-        <span id="valorFinal">$0</span>
-      </div>
+    <!-- VISTA: INGREDIENTES -->
+    <div id="view-ingredientes" class="view">
+      <div class="view-header"><h2>Ingredientes</h2></div>
+      <div id="ingredientesContent"></div>
     </div>
-
-    <div class="acciones">
-      <button class="btn btn-primary" onclick="guardarProducto()">Guardar producto</button>
-      <button class="btn" onclick="limpiarFormulario()">Limpiar</button>
-    </div>
-  </div>
-
-  <div class="card">
-    <h2>Mis productos</h2>
-    <div id="productosList" class="productos-list">
-      <p class="empty">Aún no has guardado productos.</p>
-    </div>
-  </div>
+  </main>
 </div>
 
-<script>
-  const STORAGE_KEY = 'cotizador-simple-productos';
-  let productos = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-  let editandoId = null;
+<button class="fab" id="fabBtn" aria-label="Agregar">
+  <span class="material-symbols-outlined">add</span>
+</button>
 
-  function agregarFilaIngrediente(nombre = '', cantidad = '', valorUnitario = '') {
-    const container = document.getElementById('ingredientesContainer');
+<nav class="nav-bar">
+  <div class="nav-bar-inner">
+    <button class="nav-item active" data-view="productos" onclick="cambiarVista('productos')">
+      <span class="nav-indicator"><span class="material-symbols-outlined">receipt_long</span></span>
+      <span class="nav-label">Productos</span>
+    </button>
+    <button class="nav-item" data-view="recetas" onclick="cambiarVista('recetas')">
+      <span class="nav-indicator"><span class="material-symbols-outlined">menu_book</span></span>
+      <span class="nav-label">Recetas</span>
+    </button>
+    <button class="nav-item" data-view="ingredientes" onclick="cambiarVista('ingredientes')">
+      <span class="nav-indicator"><span class="material-symbols-outlined">inventory_2</span></span>
+      <span class="nav-label">Ingredientes</span>
+    </button>
+  </div>
+</nav>
+
+<script>
+  /* ---------- Storage ---------- */
+  const KEY_ING = 'cotizador-simple-ingredientes';
+  const KEY_REC = 'cotizador-simple-recetas';
+  const KEY_PROD = 'cotizador-simple-productos';
+
+  let ingredientes = JSON.parse(localStorage.getItem(KEY_ING) || '[]');
+  let recetas = JSON.parse(localStorage.getItem(KEY_REC) || '[]');
+  let productos = JSON.parse(localStorage.getItem(KEY_PROD) || '[]');
+
+  function guardarIngredientes(){ localStorage.setItem(KEY_ING, JSON.stringify(ingredientes)); }
+  function guardarRecetas(){ localStorage.setItem(KEY_REC, JSON.stringify(recetas)); }
+  function guardarProductos(){ localStorage.setItem(KEY_PROD, JSON.stringify(productos)); }
+
+  /* ---------- Migración de datos antiguos (modelo de un solo nivel) ---------- */
+  function migrarDatosAntiguos(){
+    const tieneFormaVieja = productos.length > 0 && productos[0].recetaId === undefined;
+    if (!tieneFormaVieja) return;
+
+    const productosViejos = productos;
+    ingredientes = [];
+    recetas = [];
+    productos = [];
+
+    productosViejos.forEach(pv => {
+      const ingredientesReceta = (pv.ingredientes || []).map(ing => {
+        let existente = ingredientes.find(i => i.nombre.toLowerCase() === ing.nombre.toLowerCase());
+        if (!existente) {
+          existente = { id: generarId(), nombre: ing.nombre, valorUnitario: ing.valorUnitario || 0 };
+          ingredientes.push(existente);
+        }
+        return { ingredienteId: existente.id, cantidad: ing.cantidad || 0 };
+      });
+      const receta = { id: generarId(), nombre: pv.nombre, ingredientes: ingredientesReceta };
+      recetas.push(receta);
+      productos.push({ id: generarId(), nombre: pv.nombre, recetaId: receta.id, valorAdicional: pv.valorAdicional || 0 });
+    });
+
+    guardarIngredientes();
+    guardarRecetas();
+    guardarProductos();
+  }
+
+  /* ---------- Helpers ---------- */
+  function generarId(){ return Date.now().toString() + Math.random().toString(36).slice(2, 7); }
+
+  function formatoCLP(valor){ return '$' + Math.round(valor).toLocaleString('es-CL'); }
+
+  function getIngrediente(id){ return ingredientes.find(i => i.id === id); }
+  function getReceta(id){ return recetas.find(r => r.id === id); }
+
+  const EMOJI_INGREDIENTES = [
+    [['harina'], '🌾'],
+    [['azucar', 'azúcar'], '🍬'],
+    [['huevo'], '🥚'],
+    [['mantequilla'], '🧈'],
+    [['leche'], '🥛'],
+    [['chocolate', 'cacao'], '🍫'],
+    [['vainilla'], '🌼'],
+    [['sal'], '🧂'],
+    [['aceite'], '🫒'],
+    [['levadura', 'polvo de hornear', 'polvo hornear'], '🍞'],
+    [['limon', 'limón'], '🍋'],
+    [['naranja'], '🍊'],
+    [['fresa'], '🍓'],
+    [['coco'], '🥥'],
+    [['nuez', 'nueces', 'almendra'], '🥜'],
+    [['miel'], '🍯'],
+    [['crema'], '🍦'],
+    [['canela'], '🟤']
+  ];
+  function emojiIngrediente(nombre){
+    const n = nombre.toLowerCase();
+    const match = EMOJI_INGREDIENTES.find(([claves]) => claves.some(c => n.includes(c)));
+    return match ? match[1] : '🥄';
+  }
+
+  function costoReceta(receta){
+    if (!receta) return 0;
+    return receta.ingredientes.reduce((total, item) => {
+      const ing = getIngrediente(item.ingredienteId);
+      return total + (ing ? item.cantidad * ing.valorUnitario : 0);
+    }, 0);
+  }
+
+  function precioFinalProducto(producto){
+    const receta = getReceta(producto.recetaId);
+    return costoReceta(receta) + (producto.valorAdicional || 0);
+  }
+
+  /* ---------- FAB ---------- */
+  function mostrarFab(){ document.getElementById('fabBtn').style.display = 'flex'; }
+  function ocultarFab(){ document.getElementById('fabBtn').style.display = 'none'; }
+
+  const FAB_LABELS = { productos: 'Agregar producto', recetas: 'Agregar receta', ingredientes: 'Agregar ingrediente' };
+  function actualizarFab(vista){
+    const fab = document.getElementById('fabBtn');
+    fab.setAttribute('aria-label', FAB_LABELS[vista]);
+    fab.onclick = () => {
+      if (vista === 'productos') mostrarFormProducto();
+      if (vista === 'recetas') mostrarFormReceta();
+      if (vista === 'ingredientes') mostrarFormIngrediente();
+    };
+  }
+
+  /* ---------- Navegación ---------- */
+  function cambiarVista(vista){
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById('view-' + vista).classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(b => b.classList.toggle('active', b.dataset.view === vista));
+    actualizarFab(vista);
+    if (vista === 'productos') renderProductosList();
+    if (vista === 'recetas') renderRecetasList();
+    if (vista === 'ingredientes') renderIngredientesList();
+  }
+
+  /* ================= INGREDIENTES ================= */
+  function renderIngredientesList(){
+    mostrarFab();
+    const el = document.getElementById('ingredientesContent');
+    if (ingredientes.length === 0){
+      el.innerHTML = '<p class="empty">Aún no has agregado ingredientes.</p>';
+      return;
+    }
+    el.innerHTML = '<div class="list">' + ingredientes.map(i => `
+      <button type="button" class="list-item" onclick="mostrarFormIngrediente('${i.id}')">
+        <div class="list-icon">${emojiIngrediente(i.nombre)}</div>
+        <div class="list-body">
+          <div class="item-header">
+            <span class="item-nombre">${i.nombre}</span>
+            <span class="item-valor">${formatoCLP(i.valorUnitario)}</span>
+          </div>
+        </div>
+      </button>
+    `).join('') + '</div>';
+  }
+
+  function mostrarFormIngrediente(id){
+    ocultarFab();
+    const editando = id ? getIngrediente(id) : null;
+    const el = document.getElementById('ingredientesContent');
+    el.innerHTML = `
+      <div class="card">
+        <h3>${editando ? 'Editar ingrediente' : 'Nuevo ingrediente'}</h3>
+        <div class="field">
+          <label for="ingNombre">Nombre</label>
+          <input type="text" id="ingNombre" placeholder="Ej: Harina" value="${editando ? editando.nombre : ''}">
+        </div>
+        <div class="field">
+          <label for="ingValor">Valor unitario</label>
+          <input type="number" id="ingValor" min="0" step="any" placeholder="0" value="${editando ? editando.valorUnitario : ''}">
+        </div>
+        <div class="acciones">
+          <button class="btn btn-text" onclick="renderIngredientesList()">Cancelar</button>
+          <button class="btn btn-primary" onclick="guardarIngrediente('${editando ? editando.id : ''}')">Guardar</button>
+        </div>
+        ${editando ? `<div class="acciones"><button class="btn btn-text-danger" onclick="eliminarIngrediente('${editando.id}')">Eliminar ingrediente</button></div>` : ''}
+      </div>
+    `;
+  }
+
+  function guardarIngrediente(id){
+    const nombre = document.getElementById('ingNombre').value.trim();
+    const valorUnitario = parseFloat(document.getElementById('ingValor').value) || 0;
+    if (!nombre){ alert('Ingresa el nombre del ingrediente.'); return; }
+
+    if (id){
+      const ing = getIngrediente(id);
+      ing.nombre = nombre;
+      ing.valorUnitario = valorUnitario;
+    } else {
+      ingredientes.push({ id: generarId(), nombre, valorUnitario });
+    }
+    guardarIngredientes();
+    renderIngredientesList();
+  }
+
+  function eliminarIngrediente(id){
+    const usosEnRecetas = recetas.filter(r => r.ingredientes.some(i => i.ingredienteId === id));
+    const msg = usosEnRecetas.length > 0
+      ? `Este ingrediente se usa en ${usosEnRecetas.length} receta(s). Si lo eliminas, esas recetas quedarán con un ingrediente faltante. ¿Eliminar de todas formas?`
+      : '¿Eliminar este ingrediente?';
+    if (!confirm(msg)) return;
+
+    ingredientes = ingredientes.filter(i => i.id !== id);
+    recetas.forEach(r => { r.ingredientes = r.ingredientes.filter(i => i.ingredienteId !== id); });
+    guardarIngredientes();
+    guardarRecetas();
+    renderIngredientesList();
+  }
+
+  /* ================= RECETAS ================= */
+  function renderRecetasList(){
+    mostrarFab();
+    const el = document.getElementById('recetasContent');
+    if (recetas.length === 0){
+      el.innerHTML = '<p class="empty">Aún no has agregado recetas.</p>';
+      return;
+    }
+    el.innerHTML = '<div class="list">' + recetas.map(r => `
+      <button type="button" class="list-item" onclick="mostrarFormReceta('${r.id}')">
+        <div class="list-icon"><span class="material-symbols-outlined">menu_book</span></div>
+        <div class="list-body">
+          <div class="item-header">
+            <span class="item-nombre">${r.nombre}</span>
+            <span class="item-valor">${formatoCLP(costoReceta(r))}</span>
+          </div>
+          <div class="item-meta">
+            <span class="badge">${r.ingredientes.length} ingrediente(s)</span>
+          </div>
+        </div>
+      </button>
+    `).join('') + '</div>';
+  }
+
+  function mostrarFormReceta(id){
+    ocultarFab();
+    const editando = id ? getReceta(id) : null;
+    const el = document.getElementById('recetasContent');
+
+    if (ingredientes.length === 0){
+      el.innerHTML = `
+        <div class="empty-block">
+          <p>Primero necesitas agregar al menos un ingrediente para poder armar una receta.</p>
+          <button class="btn btn-primary" onclick="cambiarVista('ingredientes'); mostrarFormIngrediente()">Ir a Ingredientes</button>
+        </div>
+      `;
+      return;
+    }
+
+    el.innerHTML = `
+      <div class="card">
+        <h3>${editando ? 'Editar receta' : 'Nueva receta'}</h3>
+        <div class="field">
+          <label for="recNombre">Nombre de la receta</label>
+          <input type="text" id="recNombre" placeholder="Ej: Torta de chocolate" value="${editando ? editando.nombre : ''}">
+        </div>
+        <h4 class="section-label">Ingredientes</h4>
+        <div class="ing-row-header">
+          <span>Ingrediente</span><span>Cantidad</span><span>Subtotal</span><span></span>
+        </div>
+        <div id="recetaIngredientesContainer"></div>
+        <button class="btn btn-tonal btn-add-row" onclick="agregarFilaRecetaIngrediente()">+ Agregar ingrediente</button>
+        <div class="resumen">
+          <div class="resumen-row final">
+            <span>Costo total</span>
+            <span id="recetaCostoTotal">$0</span>
+          </div>
+        </div>
+        <div class="acciones">
+          <button class="btn btn-text" onclick="renderRecetasList()">Cancelar</button>
+          <button class="btn btn-primary" onclick="guardarReceta('${editando ? editando.id : ''}')">Guardar</button>
+        </div>
+        ${editando ? `<div class="acciones"><button class="btn btn-text-danger" onclick="eliminarReceta('${editando.id}')">Eliminar receta</button></div>` : ''}
+      </div>
+    `;
+
+    if (editando && editando.ingredientes.length > 0){
+      editando.ingredientes.forEach(item => agregarFilaRecetaIngrediente(item.ingredienteId, item.cantidad));
+    } else {
+      agregarFilaRecetaIngrediente();
+    }
+  }
+
+  function opcionesIngredientesHTML(seleccionadoId){
+    return ingredientes.map(i => `<option value="${i.id}" ${i.id === seleccionadoId ? 'selected' : ''}>${i.nombre}</option>`).join('');
+  }
+
+  function agregarFilaRecetaIngrediente(ingredienteId = '', cantidad = ''){
+    const container = document.getElementById('recetaIngredientesContainer');
     const row = document.createElement('div');
-    row.className = 'ingrediente-row';
+    row.className = 'receta-ing-row';
     row.innerHTML = `
-      <div>
-        <label>Ingrediente</label>
-        <input type="text" class="ing-nombre" value="${nombre}" placeholder="Ej: Harina" oninput="actualizarResumen()">
-      </div>
-      <div>
-        <label>Cantidad</label>
-        <input type="number" class="ing-cantidad" value="${cantidad}" min="0" step="any" oninput="actualizarResumen()">
-      </div>
-      <div>
-        <label>Valor unit.</label>
-        <input type="number" class="ing-valor" value="${valorUnitario}" min="0" step="any" oninput="actualizarResumen()">
-      </div>
-      <button class="btn-remove" onclick="this.closest('.ingrediente-row').remove(); actualizarResumen()">×</button>
+      <select class="rec-ing-select" aria-label="Ingrediente" onchange="actualizarResumenReceta()">${opcionesIngredientesHTML(ingredienteId)}</select>
+      <input type="number" class="rec-ing-cantidad" aria-label="Cantidad" placeholder="Cant." value="${cantidad}" min="0" step="any" oninput="actualizarResumenReceta()">
+      <div class="subtotal-display rec-ing-subtotal">$0</div>
+      <button class="btn-remove" aria-label="Quitar ingrediente" onclick="this.closest('.receta-ing-row').remove(); actualizarResumenReceta()"><span class="material-symbols-outlined">close</span></button>
     `;
     container.appendChild(row);
+    actualizarResumenReceta();
   }
 
-  function formatoCLP(valor) {
-    return '$' + Math.round(valor).toLocaleString('es-CL');
-  }
-
-  function leerIngredientes() {
-    const filas = document.querySelectorAll('.ingrediente-row');
+  function leerFilasRecetaIngredientes(){
+    const filas = document.querySelectorAll('.receta-ing-row');
     return Array.from(filas).map(fila => {
-      const nombre = fila.querySelector('.ing-nombre').value.trim();
-      const cantidad = parseFloat(fila.querySelector('.ing-cantidad').value) || 0;
-      const valorUnitario = parseFloat(fila.querySelector('.ing-valor').value) || 0;
-      return { nombre, cantidad, valorUnitario };
+      const ingredienteId = fila.querySelector('.rec-ing-select').value;
+      const cantidad = parseFloat(fila.querySelector('.rec-ing-cantidad').value) || 0;
+      return { fila, ingredienteId, cantidad };
     });
   }
 
-  function calcularCostoIngredientes(ingredientes) {
-    return ingredientes.reduce((total, ing) => total + (ing.cantidad * ing.valorUnitario), 0);
+  function actualizarResumenReceta(){
+    let total = 0;
+    leerFilasRecetaIngredientes().forEach(({ fila, ingredienteId, cantidad }) => {
+      const ing = getIngrediente(ingredienteId);
+      const subtotal = ing ? cantidad * ing.valorUnitario : 0;
+      fila.querySelector('.rec-ing-subtotal').textContent = formatoCLP(subtotal);
+      total += subtotal;
+    });
+    const totalEl = document.getElementById('recetaCostoTotal');
+    if (totalEl) totalEl.textContent = formatoCLP(total);
   }
 
-  function actualizarResumen() {
-    const ingredientes = leerIngredientes();
-    const costoIngredientes = calcularCostoIngredientes(ingredientes);
-    const valorAdicional = parseFloat(document.getElementById('valorAdicional').value) || 0;
-    const valorFinal = costoIngredientes + valorAdicional;
+  function guardarReceta(id){
+    const nombre = document.getElementById('recNombre').value.trim();
+    if (!nombre){ alert('Ingresa el nombre de la receta.'); return; }
 
-    document.getElementById('costoIngredientes').textContent = formatoCLP(costoIngredientes);
-    document.getElementById('valorAdicionalResumen').textContent = formatoCLP(valorAdicional);
-    document.getElementById('valorFinal').textContent = formatoCLP(valorFinal);
+    const ingredientesReceta = leerFilasRecetaIngredientes()
+      .filter(f => f.ingredienteId && f.cantidad > 0)
+      .map(f => ({ ingredienteId: f.ingredienteId, cantidad: f.cantidad }));
+
+    if (id){
+      const receta = getReceta(id);
+      receta.nombre = nombre;
+      receta.ingredientes = ingredientesReceta;
+    } else {
+      recetas.push({ id: generarId(), nombre, ingredientes: ingredientesReceta });
+    }
+    guardarRecetas();
+    renderRecetasList();
   }
 
-  function guardarProducto() {
-    const nombre = document.getElementById('nombreProducto').value.trim();
-    if (!nombre) {
-      alert('Ingresa el nombre del producto.');
+  function eliminarReceta(id){
+    const usosEnProductos = productos.filter(p => p.recetaId === id);
+    const msg = usosEnProductos.length > 0
+      ? `Esta receta se usa en ${usosEnProductos.length} producto(s). Si la eliminas, esos productos quedarán sin receta base. ¿Eliminar de todas formas?`
+      : '¿Eliminar esta receta?';
+    if (!confirm(msg)) return;
+
+    recetas = recetas.filter(r => r.id !== id);
+    guardarRecetas();
+    renderRecetasList();
+  }
+
+  /* ================= PRODUCTOS ================= */
+  function renderProductosList(){
+    mostrarFab();
+    const el = document.getElementById('productosContent');
+    if (productos.length === 0){
+      el.innerHTML = '<p class="empty">Aún no has guardado productos.</p>';
       return;
     }
-    const ingredientes = leerIngredientes().filter(ing => ing.nombre);
-    const costoIngredientes = calcularCostoIngredientes(ingredientes);
-    const valorAdicional = parseFloat(document.getElementById('valorAdicional').value) || 0;
-    const valorFinal = costoIngredientes + valorAdicional;
+    el.innerHTML = '<div class="list">' + productos.map(p => {
+      const receta = getReceta(p.recetaId);
+      const meta = receta
+        ? `<div class="item-meta">
+             <span class="badge">📖 ${receta.nombre}</span>
+             <span class="item-adicional">+ ${formatoCLP(p.valorAdicional || 0)} adicional</span>
+           </div>`
+        : '<div class="item-warning">Receta base eliminada — revisa este producto</div>';
+      return `
+      <button type="button" class="list-item" onclick="mostrarFormProducto('${p.id}')">
+        <div class="list-icon"><span class="material-symbols-outlined">receipt_long</span></div>
+        <div class="list-body">
+          <div class="item-header">
+            <span class="item-nombre">${p.nombre}</span>
+            <span class="item-valor">${formatoCLP(precioFinalProducto(p))}</span>
+          </div>
+          ${meta}
+        </div>
+      </button>
+    `;
+    }).join('') + '</div>';
+  }
 
-    const producto = {
-      id: editandoId || Date.now().toString(),
-      nombre,
-      ingredientes,
-      valorAdicional,
-      costoIngredientes,
-      valorFinal
-    };
+  function mostrarFormProducto(id){
+    ocultarFab();
+    const editando = id ? productos.find(p => p.id === id) : null;
+    const el = document.getElementById('productosContent');
 
-    if (editandoId) {
-      productos = productos.map(p => p.id === editandoId ? producto : p);
-    } else {
-      productos.push(producto);
+    if (recetas.length === 0){
+      el.innerHTML = `
+        <div class="empty-block">
+          <p>Primero necesitas crear al menos una receta para poder cotizar un producto.</p>
+          <button class="btn btn-primary" onclick="cambiarVista('recetas'); mostrarFormReceta()">Ir a Recetas</button>
+        </div>
+      `;
+      return;
     }
 
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(productos));
-    limpiarFormulario();
-    renderProductos();
+    el.innerHTML = `
+      <div class="card">
+        <h3>${editando ? 'Editar producto' : 'Nuevo producto'}</h3>
+        <div class="field">
+          <label for="prodNombre">Nombre del producto</label>
+          <input type="text" id="prodNombre" placeholder="Ej: Torta de chocolate mediana" value="${editando ? editando.nombre : ''}">
+        </div>
+        <div class="field">
+          <label for="prodReceta">Receta base</label>
+          <select id="prodReceta" onchange="actualizarResumenProducto()">${recetas.map(r => `<option value="${r.id}" ${editando && editando.recetaId === r.id ? 'selected' : ''}>${r.nombre}</option>`).join('')}</select>
+        </div>
+        <div class="field">
+          <label for="prodValorAdicional">Valor adicional (mano de obra, utilidad, etc.)</label>
+          <input type="number" id="prodValorAdicional" min="0" step="any" placeholder="0" value="${editando ? editando.valorAdicional : ''}" oninput="actualizarResumenProducto()">
+        </div>
+        <div class="resumen">
+          <div class="resumen-row">
+            <span>Costo receta</span>
+            <span id="prodCostoReceta">$0</span>
+          </div>
+          <div class="resumen-row final">
+            <span>Precio final</span>
+            <span id="prodPrecioFinal">$0</span>
+          </div>
+        </div>
+        <div class="acciones">
+          <button class="btn btn-text" onclick="renderProductosList()">Cancelar</button>
+          <button class="btn btn-primary" onclick="guardarProducto('${editando ? editando.id : ''}')">Guardar</button>
+        </div>
+        ${editando ? `<div class="acciones"><button class="btn btn-text-danger" onclick="eliminarProducto('${editando.id}')">Eliminar producto</button></div>` : ''}
+      </div>
+    `;
+    actualizarResumenProducto();
   }
 
-  function limpiarFormulario() {
-    document.getElementById('nombreProducto').value = '';
-    document.getElementById('valorAdicional').value = '';
-    document.getElementById('ingredientesContainer').innerHTML = '';
-    agregarFilaIngrediente();
-    editandoId = null;
-    actualizarResumen();
+  function actualizarResumenProducto(){
+    const recetaId = document.getElementById('prodReceta').value;
+    const receta = getReceta(recetaId);
+    const costo = costoReceta(receta);
+    const valorAdicional = parseFloat(document.getElementById('prodValorAdicional').value) || 0;
+    document.getElementById('prodCostoReceta').textContent = formatoCLP(costo);
+    document.getElementById('prodPrecioFinal').textContent = formatoCLP(costo + valorAdicional);
   }
 
-  function editarProducto(id) {
-    const producto = productos.find(p => p.id === id);
-    if (!producto) return;
-    editandoId = id;
-    document.getElementById('nombreProducto').value = producto.nombre;
-    document.getElementById('valorAdicional').value = producto.valorAdicional;
-    document.getElementById('ingredientesContainer').innerHTML = '';
-    producto.ingredientes.forEach(ing => agregarFilaIngrediente(ing.nombre, ing.cantidad, ing.valorUnitario));
-    actualizarResumen();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  function guardarProducto(id){
+    const nombre = document.getElementById('prodNombre').value.trim();
+    if (!nombre){ alert('Ingresa el nombre del producto.'); return; }
+    const recetaId = document.getElementById('prodReceta').value;
+    const valorAdicional = parseFloat(document.getElementById('prodValorAdicional').value) || 0;
+
+    if (id){
+      const producto = productos.find(p => p.id === id);
+      producto.nombre = nombre;
+      producto.recetaId = recetaId;
+      producto.valorAdicional = valorAdicional;
+    } else {
+      productos.push({ id: generarId(), nombre, recetaId, valorAdicional });
+    }
+    guardarProductos();
+    renderProductosList();
   }
 
-  function eliminarProducto(id) {
+  function eliminarProducto(id){
     if (!confirm('¿Eliminar este producto?')) return;
     productos = productos.filter(p => p.id !== id);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(productos));
-    renderProductos();
+    guardarProductos();
+    renderProductosList();
   }
 
-  function renderProductos() {
-    const list = document.getElementById('productosList');
-    if (productos.length === 0) {
-      list.innerHTML = '<p class="empty">Aún no has guardado productos.</p>';
-      return;
-    }
-    list.innerHTML = productos.map(p => `
-      <div class="producto-item">
-        <div class="producto-header">
-          <span class="producto-nombre">${p.nombre}</span>
-          <span class="producto-precio">${formatoCLP(p.valorFinal)}</span>
-        </div>
-        <div class="producto-detalle">
-          ${p.ingredientes.length} ingrediente(s) · Costo: ${formatoCLP(p.costoIngredientes)} · Adicional: ${formatoCLP(p.valorAdicional)}
-        </div>
-        <div class="producto-actions">
-          <button class="btn" onclick="editarProducto('${p.id}')">Editar</button>
-          <button class="btn" onclick="eliminarProducto('${p.id}')">Eliminar</button>
-        </div>
-      </div>
-    `).join('');
-  }
-
-  agregarFilaIngrediente();
-  renderProductos();
+  /* ---------- Init ---------- */
+  migrarDatosAntiguos();
+  actualizarFab('productos');
+  renderProductosList();
 </script>
 </body>
 </html>
