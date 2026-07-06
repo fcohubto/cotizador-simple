@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Cotizador Simple</title>
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icon.svg">
@@ -86,7 +86,7 @@
   .app{
     max-width: 720px;
     margin: 0 auto;
-    padding: 0 var(--sp-5) calc(var(--nav-height) + 96px);
+    padding: 0 var(--sp-5) calc(var(--nav-height) + env(safe-area-inset-bottom) + 96px);
   }
   .top-app-bar{
     padding: var(--sp-5) 0 var(--sp-3);
@@ -103,12 +103,35 @@
   }
   .view{ display: none; }
   .view.active{ display: block; }
-  .view-header{ margin-bottom: var(--sp-5); }
+  .view-header{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sp-3);
+    margin-bottom: var(--sp-5);
+  }
   .view-header h2{
     font-size: var(--text-xl);
     font-weight: 700;
     margin: 0;
   }
+  .btn-header-add{
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+    border: none;
+    border-radius: var(--shape-full);
+    background: var(--md-primary-container);
+    color: var(--md-on-primary-container);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background var(--motion-fast) var(--motion-easing), color var(--motion-fast) var(--motion-easing), transform var(--motion-fast) var(--motion-easing);
+  }
+  .btn-header-add:hover{ background: var(--md-primary); color: var(--md-on-primary); }
+  .btn-header-add:active{ transform: scale(0.94); }
+  .btn-header-add .material-symbols-outlined{ font-size: 24px; }
   .card{
     background: var(--md-surface-container);
     border-radius: var(--shape-lg);
@@ -140,7 +163,7 @@
   }
   .ing-row-header{
     display: grid;
-    grid-template-columns: 1fr 80px 90px 44px;
+    grid-template-columns: 1fr 110px 90px 44px;
     gap: var(--sp-2);
     font-size: var(--text-base);
     font-weight: 600;
@@ -183,7 +206,7 @@
     border-radius: var(--shape-xs) var(--shape-xs) 0 0;
     color: var(--md-on-surface);
     padding: var(--sp-3) var(--sp-4);
-    font-size: var(--text-base);
+    font-size: var(--text-md);
     font-family: inherit;
     min-height: 44px;
     transition: border-color var(--motion-fast) var(--motion-easing), background var(--motion-fast) var(--motion-easing);
@@ -254,7 +277,7 @@
   }
   .receta-ing-row{
     display: grid;
-    grid-template-columns: 1fr 80px 90px 44px;
+    grid-template-columns: 1fr 110px 90px 44px;
     gap: var(--sp-2);
     margin-bottom: var(--sp-3);
     align-items: center;
@@ -347,6 +370,41 @@
     line-height: 1;
   }
   .list-body{ flex: 1; min-width: 0; }
+  .list-chevron{
+    flex-shrink: 0;
+    color: var(--md-on-surface-variant);
+    font-size: 20px;
+  }
+  .metric-strip-group{
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-3);
+    background: var(--md-surface-container);
+    border-radius: var(--shape-lg);
+    padding: var(--sp-5);
+    margin-bottom: var(--sp-5);
+  }
+  .metric-strip{
+    display: flex;
+    align-items: baseline;
+    gap: var(--sp-3);
+    padding-bottom: var(--sp-3);
+    border-bottom: 1px solid var(--md-outline-variant);
+  }
+  .metric-strip:last-child{ border-bottom: none; padding-bottom: 0; }
+  .metric-value{
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--md-primary);
+    line-height: 1;
+  }
+  .metric-label{
+    font-size: var(--text-base);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--md-on-surface-variant);
+  }
   .item-header{
     display: flex;
     justify-content: space-between;
@@ -391,33 +449,43 @@
     font-size: var(--text-base);
     margin: 0 0 var(--sp-4);
   }
-  .fab{
-    position: fixed;
-    right: max(var(--sp-5), calc(50vw - 336px));
-    bottom: calc(var(--nav-height) + var(--sp-4));
-    width: 56px;
-    height: 56px;
-    border-radius: var(--shape-lg);
-    background: var(--md-primary-container);
-    color: var(--md-on-primary-container);
-    border: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.35), 0 1px 3px rgba(0,0,0,0.3);
-    cursor: pointer;
-    transition: background var(--motion-fast) var(--motion-easing), color var(--motion-fast) var(--motion-easing), transform var(--motion-fast) var(--motion-easing);
-    z-index: 20;
+  .onboarding-intro{
+    font-size: var(--text-md);
+    color: var(--md-on-surface-variant);
+    margin: 0 0 var(--sp-5);
   }
-  .fab:hover{ background: var(--md-primary); color: var(--md-on-primary); }
-  .fab:active{ transform: scale(0.94); }
-  .fab .material-symbols-outlined{ font-size: 26px; }
+  .onboarding-step{
+    display: flex;
+    align-items: flex-start;
+    gap: var(--sp-4);
+    padding-bottom: var(--sp-4);
+    margin-bottom: var(--sp-4);
+    border-bottom: 1px solid var(--md-outline-variant);
+  }
+  .onboarding-step:last-of-type{ border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .onboarding-step-number{
+    flex-shrink: 0;
+    min-width: 1.1em;
+    font-size: var(--text-2xl);
+    font-weight: 700;
+    color: var(--md-primary);
+    line-height: 1;
+  }
+  .onboarding-step-text{
+    font-size: var(--text-base);
+    color: var(--md-on-surface);
+  }
+  .onboarding-cta{
+    width: 100%;
+    margin-top: var(--sp-5);
+  }
   .nav-bar{
     position: fixed;
     left: 0;
     right: 0;
     bottom: 0;
-    height: var(--nav-height);
+    height: calc(var(--nav-height) + env(safe-area-inset-bottom));
+    padding-bottom: env(safe-area-inset-bottom);
     background: var(--md-surface-container);
     border-top: 1px solid var(--md-outline-variant);
     z-index: 10;
@@ -440,7 +508,7 @@
     cursor: pointer;
     font-family: inherit;
     color: var(--md-on-surface-variant);
-    padding: var(--sp-2) 0;
+    padding: var(--sp-3) 0;
   }
   .nav-indicator{
     display: flex;
@@ -470,33 +538,54 @@
   </header>
 
   <main>
+    <!-- VISTA: INICIO -->
+    <div id="view-inicio" class="view active">
+      <div class="view-header"><h2>Inicio</h2></div>
+      <div id="inicioContent"></div>
+    </div>
+
     <!-- VISTA: PRODUCTOS -->
-    <div id="view-productos" class="view active">
-      <div class="view-header"><h2>Mis productos</h2></div>
+    <div id="view-productos" class="view">
+      <div class="view-header">
+        <h2>Mis productos</h2>
+        <button class="btn-header-add" id="addBtnProductos" aria-label="Agregar producto" onclick="mostrarFormProducto()">
+          <span class="material-symbols-outlined">add</span>
+        </button>
+      </div>
       <div id="productosContent"></div>
     </div>
 
     <!-- VISTA: RECETAS -->
     <div id="view-recetas" class="view">
-      <div class="view-header"><h2>Mis recetas</h2></div>
+      <div class="view-header">
+        <h2>Mis recetas</h2>
+        <button class="btn-header-add" id="addBtnRecetas" aria-label="Agregar receta" onclick="mostrarFormReceta()">
+          <span class="material-symbols-outlined">add</span>
+        </button>
+      </div>
       <div id="recetasContent"></div>
     </div>
 
     <!-- VISTA: INGREDIENTES -->
     <div id="view-ingredientes" class="view">
-      <div class="view-header"><h2>Ingredientes</h2></div>
+      <div class="view-header">
+        <h2>Ingredientes</h2>
+        <button class="btn-header-add" id="addBtnIngredientes" aria-label="Agregar ingrediente" onclick="mostrarFormIngrediente()">
+          <span class="material-symbols-outlined">add</span>
+        </button>
+      </div>
       <div id="ingredientesContent"></div>
     </div>
   </main>
 </div>
 
-<button class="fab" id="fabBtn" aria-label="Agregar">
-  <span class="material-symbols-outlined">add</span>
-</button>
-
 <nav class="nav-bar">
   <div class="nav-bar-inner">
-    <button class="nav-item active" data-view="productos" onclick="cambiarVista('productos')">
+    <button class="nav-item active" data-view="inicio" onclick="cambiarVista('inicio')">
+      <span class="nav-indicator"><span class="material-symbols-outlined">home</span></span>
+      <span class="nav-label">Inicio</span>
+    </button>
+    <button class="nav-item" data-view="productos" onclick="cambiarVista('productos')">
       <span class="nav-indicator"><span class="material-symbols-outlined">receipt_long</span></span>
       <span class="nav-label">Productos</span>
     </button>
@@ -590,10 +679,31 @@
     [['crema'], '🍦'],
     [['canela'], '🟤']
   ];
-  function emojiIngrediente(nombre){
+  const EMOJI_PREPARACIONES = [
+    [['torta', 'queque', 'pastel', 'cake'], '🎂'],
+    [['cupcake', 'magdalena', 'muffin'], '🧁'],
+    [['galleta', 'cookie'], '🍪'],
+    [['brownie'], '🍫'],
+    [['tarta', 'pie'], '🥧'],
+    [['pan', 'baguette'], '🍞'],
+    [['empanada'], '🥟'],
+    [['helado'], '🍨'],
+    [['pizza'], '🍕'],
+    [['dona', 'donut'], '🍩']
+  ];
+  function buscarEmoji(nombre, listas){
     const n = nombre.toLowerCase();
-    const match = EMOJI_INGREDIENTES.find(([claves]) => claves.some(c => n.includes(c)));
-    return match ? match[1] : '🥄';
+    for (const lista of listas){
+      const match = lista.find(([claves]) => claves.some(c => n.includes(c)));
+      if (match) return match[1];
+    }
+    return null;
+  }
+  function emojiIngrediente(nombre){
+    return buscarEmoji(nombre, [EMOJI_INGREDIENTES]) || '🥄';
+  }
+  function emojiPreparacion(nombre){
+    return buscarEmoji(nombre, [EMOJI_PREPARACIONES, EMOJI_INGREDIENTES]) || '🍽️';
   }
 
   const UNIDADES = [
@@ -622,35 +732,79 @@
     return costoReceta(receta) + (producto.valorAdicional || 0);
   }
 
-  /* ---------- FAB ---------- */
-  function mostrarFab(){ document.getElementById('fabBtn').style.display = 'flex'; }
-  function ocultarFab(){ document.getElementById('fabBtn').style.display = 'none'; }
-
-  const FAB_LABELS = { productos: 'Agregar producto', recetas: 'Agregar receta', ingredientes: 'Agregar ingrediente' };
-  function actualizarFab(vista){
-    const fab = document.getElementById('fabBtn');
-    fab.setAttribute('aria-label', FAB_LABELS[vista]);
-    fab.onclick = () => {
-      if (vista === 'productos') mostrarFormProducto();
-      if (vista === 'recetas') mostrarFormReceta();
-      if (vista === 'ingredientes') mostrarFormIngrediente();
-    };
-  }
-
   /* ---------- Navegación ---------- */
   function cambiarVista(vista){
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
     document.getElementById('view-' + vista).classList.add('active');
     document.querySelectorAll('.nav-item').forEach(b => b.classList.toggle('active', b.dataset.view === vista));
-    actualizarFab(vista);
+    if (vista === 'inicio') renderInicio();
     if (vista === 'productos') renderProductosList();
     if (vista === 'recetas') renderRecetasList();
     if (vista === 'ingredientes') renderIngredientesList();
   }
 
+  /* ================= INICIO ================= */
+  function renderInicio(){
+    const el = document.getElementById('inicioContent');
+
+    if (productos.length === 0 && recetas.length === 0 && ingredientes.length === 0){
+      el.innerHTML = `
+        <div class="card">
+          <h3 class="section-label">Primeros pasos</h3>
+          <p class="onboarding-intro">Aún no tienes nada cargado en tu cotizador.</p>
+          <div class="onboarding-step">
+            <span class="onboarding-step-number">1</span>
+            <span class="onboarding-step-text">Agrega tus ingredientes, con su unidad de medida y precio.</span>
+          </div>
+          <div class="onboarding-step">
+            <span class="onboarding-step-number">2</span>
+            <span class="onboarding-step-text">Arma una receta combinando ingredientes.</span>
+          </div>
+          <div class="onboarding-step">
+            <span class="onboarding-step-number">3</span>
+            <span class="onboarding-step-text">Crea un producto a partir de la receta y cotiza.</span>
+          </div>
+          <button class="btn btn-primary onboarding-cta" onclick="cambiarVista('ingredientes'); mostrarFormIngrediente()">Agregar mi primer ingrediente</button>
+        </div>
+      `;
+      return;
+    }
+
+    const ultimosProductos = productos.slice(-3).reverse();
+
+    const listaUltimos = ultimosProductos.length === 0
+      ? '<p class="empty">Aún no has agregado productos.</p>'
+      : '<div class="list">' + ultimosProductos.map(p => {
+          const receta = getReceta(p.recetaId);
+          return `
+          <button type="button" class="list-item" onclick="cambiarVista('productos'); mostrarFormProducto('${p.id}')">
+            <div class="list-icon">${emojiPreparacion(p.nombre)}</div>
+            <div class="list-body">
+              <div class="item-header">
+                <span class="item-nombre">${p.nombre}</span>
+                <span class="item-valor">${formatoCLP(precioFinalProducto(p))}</span>
+              </div>
+              ${receta ? `<div class="item-meta"><span class="badge">📖 ${receta.nombre}</span></div>` : ''}
+            </div>
+            <span class="list-chevron material-symbols-outlined" aria-hidden="true">chevron_right</span>
+          </button>
+        `;
+        }).join('') + '</div>';
+
+    el.innerHTML = `
+      <div class="metric-strip-group">
+        <div class="metric-strip"><span class="metric-value">${productos.length}</span><span class="metric-label">Productos</span></div>
+        <div class="metric-strip"><span class="metric-value">${recetas.length}</span><span class="metric-label">Recetas</span></div>
+        <div class="metric-strip"><span class="metric-value">${ingredientes.length}</span><span class="metric-label">Ingredientes</span></div>
+      </div>
+      <h4 class="section-label">Últimos productos</h4>
+      ${listaUltimos}
+    `;
+  }
+
   /* ================= INGREDIENTES ================= */
   function renderIngredientesList(){
-    mostrarFab();
+    document.getElementById('addBtnIngredientes').style.display = 'flex';
     const el = document.getElementById('ingredientesContent');
     if (ingredientes.length === 0){
       el.innerHTML = '<p class="empty">Aún no has agregado ingredientes.</p>';
@@ -670,7 +824,7 @@
   }
 
   function mostrarFormIngrediente(id){
-    ocultarFab();
+    document.getElementById('addBtnIngredientes').style.display = 'none';
     const editando = id ? getIngrediente(id) : null;
     const el = document.getElementById('ingredientesContent');
     el.innerHTML = `
@@ -737,7 +891,7 @@
 
   /* ================= RECETAS ================= */
   function renderRecetasList(){
-    mostrarFab();
+    document.getElementById('addBtnRecetas').style.display = 'flex';
     const el = document.getElementById('recetasContent');
     if (recetas.length === 0){
       el.innerHTML = '<p class="empty">Aún no has agregado recetas.</p>';
@@ -745,7 +899,7 @@
     }
     el.innerHTML = '<div class="list">' + recetas.map(r => `
       <button type="button" class="list-item" onclick="mostrarFormReceta('${r.id}')">
-        <div class="list-icon"><span class="material-symbols-outlined">menu_book</span></div>
+        <div class="list-icon">${emojiPreparacion(r.nombre)}</div>
         <div class="list-body">
           <div class="item-header">
             <span class="item-nombre">${r.nombre}</span>
@@ -755,12 +909,13 @@
             <span class="badge">${r.ingredientes.length} ingrediente(s)</span>
           </div>
         </div>
+        <span class="list-chevron material-symbols-outlined" aria-hidden="true">chevron_right</span>
       </button>
     `).join('') + '</div>';
   }
 
   function mostrarFormReceta(id){
-    ocultarFab();
+    document.getElementById('addBtnRecetas').style.display = 'none';
     const editando = id ? getReceta(id) : null;
     const el = document.getElementById('recetasContent');
 
@@ -819,7 +974,7 @@
     row.innerHTML = `
       <select class="rec-ing-select" aria-label="Ingrediente" onchange="actualizarResumenReceta()">${opcionesIngredientesHTML(ingredienteId)}</select>
       <div class="rec-ing-cantidad cantidad-wrap">
-        <input type="number" class="rec-ing-cantidad-input" aria-label="Cantidad" placeholder="Cant." value="${cantidad}" min="0" step="any" oninput="actualizarResumenReceta()">
+        <input type="number" class="rec-ing-cantidad-input" aria-label="Cantidad" placeholder="0" value="${cantidad}" min="0" step="any" oninput="actualizarResumenReceta()">
         <span class="cantidad-unidad"></span>
       </div>
       <div class="subtotal-display rec-ing-subtotal">$0</div>
@@ -884,7 +1039,7 @@
 
   /* ================= PRODUCTOS ================= */
   function renderProductosList(){
-    mostrarFab();
+    document.getElementById('addBtnProductos').style.display = 'flex';
     const el = document.getElementById('productosContent');
     if (productos.length === 0){
       el.innerHTML = '<p class="empty">Aún no has guardado productos.</p>';
@@ -900,7 +1055,7 @@
         : '<div class="item-warning">Receta base eliminada — revisa este producto</div>';
       return `
       <button type="button" class="list-item" onclick="mostrarFormProducto('${p.id}')">
-        <div class="list-icon"><span class="material-symbols-outlined">receipt_long</span></div>
+        <div class="list-icon">${emojiPreparacion(p.nombre)}</div>
         <div class="list-body">
           <div class="item-header">
             <span class="item-nombre">${p.nombre}</span>
@@ -908,13 +1063,14 @@
           </div>
           ${meta}
         </div>
+        <span class="list-chevron material-symbols-outlined" aria-hidden="true">chevron_right</span>
       </button>
     `;
     }).join('') + '</div>';
   }
 
   function mostrarFormProducto(id){
-    ocultarFab();
+    document.getElementById('addBtnProductos').style.display = 'none';
     const editando = id ? productos.find(p => p.id === id) : null;
     const el = document.getElementById('productosContent');
 
@@ -1000,8 +1156,7 @@
   /* ---------- Init ---------- */
   migrarDatosAntiguos();
   migrarUnidadesIngredientes();
-  actualizarFab('productos');
-  renderProductosList();
+  renderInicio();
 </script>
 </body>
 </html>
