@@ -264,6 +264,17 @@
     color: var(--md-on-surface-variant);
     padding: var(--sp-3) 0;
   }
+  .cantidad-wrap{ position: relative; }
+  .cantidad-wrap input{ padding-right: 36px; }
+  .cantidad-unidad{
+    position: absolute;
+    right: var(--sp-2);
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: var(--text-base);
+    color: var(--md-on-surface-variant);
+    pointer-events: none;
+  }
   @media (max-width: 480px){
     .receta-ing-row{
       grid-template-columns: 1fr 1fr 44px;
@@ -528,7 +539,7 @@
       const ingredientesReceta = (pv.ingredientes || []).map(ing => {
         let existente = ingredientes.find(i => i.nombre.toLowerCase() === ing.nombre.toLowerCase());
         if (!existente) {
-          existente = { id: generarId(), nombre: ing.nombre, valorUnitario: ing.valorUnitario || 0 };
+          existente = { id: generarId(), nombre: ing.nombre, valorUnitario: ing.valorUnitario || 0, unidad: 'unidad' };
           ingredientes.push(existente);
         }
         return { ingredienteId: existente.id, cantidad: ing.cantidad || 0 };
@@ -541,6 +552,14 @@
     guardarIngredientes();
     guardarRecetas();
     guardarProductos();
+  }
+
+  function migrarUnidadesIngredientes(){
+    let cambio = false;
+    ingredientes.forEach(ing => {
+      if (!ing.unidad){ ing.unidad = 'unidad'; cambio = true; }
+    });
+    if (cambio) guardarIngredientes();
   }
 
   /* ---------- Helpers ---------- */
@@ -575,6 +594,19 @@
     const n = nombre.toLowerCase();
     const match = EMOJI_INGREDIENTES.find(([claves]) => claves.some(c => n.includes(c)));
     return match ? match[1] : '🥄';
+  }
+
+  const UNIDADES = [
+    { value: 'unidad', abrev: 'un', label: 'Unidad' },
+    { value: 'kg', abrev: 'kg', label: 'Kilogramo' },
+    { value: 'g', abrev: 'g', label: 'Gramo' },
+    { value: 'L', abrev: 'L', label: 'Litro' },
+    { value: 'ml', abrev: 'ml', label: 'Mililitro' },
+    { value: 'docena', abrev: 'doc', label: 'Docena' }
+  ];
+  function getUnidad(value){ return UNIDADES.find(u => u.value === value) || UNIDADES[0]; }
+  function opcionesUnidadesHTML(seleccionada){
+    return UNIDADES.map(u => `<option value="${u.value}" ${u.value === seleccionada ? 'selected' : ''}>${u.label}</option>`).join('');
   }
 
   function costoReceta(receta){
@@ -630,7 +662,7 @@
         <div class="list-body">
           <div class="item-header">
             <span class="item-nombre">${i.nombre}</span>
-            <span class="item-valor">${formatoCLP(i.valorUnitario)}</span>
+            <span class="item-valor">${formatoCLP(i.valorUnitario)} / ${getUnidad(i.unidad).abrev}</span>
           </div>
         </div>
       </button>
@@ -649,7 +681,11 @@
           <input type="text" id="ingNombre" placeholder="Ej: Harina" value="${editando ? editando.nombre : ''}">
         </div>
         <div class="field">
-          <label for="ingValor">Valor unitario</label>
+          <label for="ingUnidad">Unidad de medida</label>
+          <select id="ingUnidad" onchange="actualizarLabelValorIngrediente()">${opcionesUnidadesHTML(editando ? editando.unidad : 'unidad')}</select>
+        </div>
+        <div class="field">
+          <label for="ingValor" id="ingValorLabel">Valor por unidad</label>
           <input type="number" id="ingValor" min="0" step="any" placeholder="0" value="${editando ? editando.valorUnitario : ''}">
         </div>
         <div class="acciones">
@@ -659,19 +695,27 @@
         ${editando ? `<div class="acciones"><button class="btn btn-text-danger" onclick="eliminarIngrediente('${editando.id}')">Eliminar ingrediente</button></div>` : ''}
       </div>
     `;
+    actualizarLabelValorIngrediente();
+  }
+
+  function actualizarLabelValorIngrediente(){
+    const u = getUnidad(document.getElementById('ingUnidad').value);
+    document.getElementById('ingValorLabel').textContent = 'Valor por ' + u.label.toLowerCase();
   }
 
   function guardarIngrediente(id){
     const nombre = document.getElementById('ingNombre').value.trim();
+    const unidad = document.getElementById('ingUnidad').value;
     const valorUnitario = parseFloat(document.getElementById('ingValor').value) || 0;
     if (!nombre){ alert('Ingresa el nombre del ingrediente.'); return; }
 
     if (id){
       const ing = getIngrediente(id);
       ing.nombre = nombre;
+      ing.unidad = unidad;
       ing.valorUnitario = valorUnitario;
     } else {
-      ingredientes.push({ id: generarId(), nombre, valorUnitario });
+      ingredientes.push({ id: generarId(), nombre, unidad, valorUnitario });
     }
     guardarIngredientes();
     renderIngredientesList();
@@ -774,7 +818,10 @@
     row.className = 'receta-ing-row';
     row.innerHTML = `
       <select class="rec-ing-select" aria-label="Ingrediente" onchange="actualizarResumenReceta()">${opcionesIngredientesHTML(ingredienteId)}</select>
-      <input type="number" class="rec-ing-cantidad" aria-label="Cantidad" placeholder="Cant." value="${cantidad}" min="0" step="any" oninput="actualizarResumenReceta()">
+      <div class="rec-ing-cantidad cantidad-wrap">
+        <input type="number" class="rec-ing-cantidad-input" aria-label="Cantidad" placeholder="Cant." value="${cantidad}" min="0" step="any" oninput="actualizarResumenReceta()">
+        <span class="cantidad-unidad"></span>
+      </div>
       <div class="subtotal-display rec-ing-subtotal">$0</div>
       <button class="btn-remove" aria-label="Quitar ingrediente" onclick="this.closest('.receta-ing-row').remove(); actualizarResumenReceta()"><span class="material-symbols-outlined">close</span></button>
     `;
@@ -786,7 +833,7 @@
     const filas = document.querySelectorAll('.receta-ing-row');
     return Array.from(filas).map(fila => {
       const ingredienteId = fila.querySelector('.rec-ing-select').value;
-      const cantidad = parseFloat(fila.querySelector('.rec-ing-cantidad').value) || 0;
+      const cantidad = parseFloat(fila.querySelector('.rec-ing-cantidad-input').value) || 0;
       return { fila, ingredienteId, cantidad };
     });
   }
@@ -797,6 +844,7 @@
       const ing = getIngrediente(ingredienteId);
       const subtotal = ing ? cantidad * ing.valorUnitario : 0;
       fila.querySelector('.rec-ing-subtotal').textContent = formatoCLP(subtotal);
+      fila.querySelector('.cantidad-unidad').textContent = ing ? getUnidad(ing.unidad).abrev : '';
       total += subtotal;
     });
     const totalEl = document.getElementById('recetaCostoTotal');
@@ -951,6 +999,7 @@
 
   /* ---------- Init ---------- */
   migrarDatosAntiguos();
+  migrarUnidadesIngredientes();
   actualizarFab('productos');
   renderProductosList();
 </script>
