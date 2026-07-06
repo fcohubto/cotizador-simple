@@ -528,9 +528,52 @@
     font-weight: 500;
   }
   .nav-item.active .nav-label{ font-weight: 700; }
+  .access-gate{
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: var(--md-surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--sp-5);
+    z-index: 100;
+  }
+  .access-gate-card{
+    width: 100%;
+    max-width: 360px;
+    background: var(--md-surface-container);
+    border-radius: var(--shape-lg);
+    padding: var(--sp-5);
+  }
+  .access-gate-card h2{
+    font-size: var(--text-xl);
+    font-weight: 700;
+    margin: 0 0 var(--sp-2);
+  }
+  .access-gate-card > p{
+    color: var(--md-on-surface-variant);
+    font-size: var(--text-base);
+    margin: 0 0 var(--sp-5);
+  }
 </style>
 </head>
 <body>
+<div id="accessGate" class="access-gate">
+  <div class="access-gate-card">
+    <h2>Acceso privado</h2>
+    <p>Ingresa la contraseña para continuar.</p>
+    <form onsubmit="event.preventDefault(); verificarAcceso();">
+      <div class="field">
+        <label for="gatePassword">Contraseña</label>
+        <input type="password" id="gatePassword" placeholder="••••••••" autocomplete="off">
+      </div>
+      <p id="gateError" class="item-warning" style="display:none;">Contraseña incorrecta.</p>
+      <button type="submit" class="btn btn-primary" style="width:100%;">Entrar</button>
+    </form>
+  </div>
+</div>
+
+<div id="appContent" style="display:none;">
 <div class="app">
   <header class="top-app-bar">
     <h1>Cotizador Simple</h1>
@@ -599,6 +642,7 @@
     </button>
   </div>
 </nav>
+</div>
 
 <script>
   /* ---------- Storage ---------- */
@@ -1154,9 +1198,41 @@
   }
 
   /* ---------- Init ---------- */
-  migrarDatosAntiguos();
-  migrarUnidadesIngredientes();
-  renderInicio();
+  function initApp(){
+    migrarDatosAntiguos();
+    migrarUnidadesIngredientes();
+    renderInicio();
+  }
+
+  /* ---------- Acceso (barrera liviana, no es seguridad real) ---------- */
+  const GATE_HASH = '7416412290f8f691d76c71a5d59729d2b2593de7a51f825724079ed9047f84da';
+  const GATE_KEY = 'cotizador-simple-acceso';
+
+  async function sha256Hex(texto){
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(texto));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+
+  function desbloquear(){
+    document.getElementById('accessGate').style.display = 'none';
+    document.getElementById('appContent').style.display = 'block';
+    initApp();
+  }
+
+  async function verificarAcceso(){
+    const valor = document.getElementById('gatePassword').value;
+    const hash = await sha256Hex(valor);
+    if (hash === GATE_HASH){
+      localStorage.setItem(GATE_KEY, '1');
+      desbloquear();
+    } else {
+      document.getElementById('gateError').style.display = 'block';
+    }
+  }
+
+  if (localStorage.getItem(GATE_KEY) === '1'){
+    desbloquear();
+  }
 </script>
 </body>
 </html>
