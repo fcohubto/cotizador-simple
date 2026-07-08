@@ -86,7 +86,7 @@
   .app{
     max-width: 720px;
     margin: 0 auto;
-    padding: 0 var(--sp-5) calc(var(--nav-height) + env(safe-area-inset-bottom) + 96px);
+    padding: env(safe-area-inset-top) var(--sp-5) calc(var(--nav-height) + env(safe-area-inset-bottom) + 96px);
   }
   .top-app-bar{
     padding: var(--sp-5) 0 var(--sp-3);
@@ -484,7 +484,6 @@
     left: 0;
     right: 0;
     bottom: 0;
-    height: calc(var(--nav-height) + env(safe-area-inset-bottom));
     padding-bottom: env(safe-area-inset-bottom);
     background: var(--md-surface-container);
     border-top: 1px solid var(--md-outline-variant);
@@ -493,7 +492,7 @@
   .nav-bar-inner{
     max-width: 720px;
     margin: 0 auto;
-    height: 100%;
+    height: var(--nav-height);
     display: flex;
   }
   .nav-item{
@@ -502,26 +501,26 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 2px;
     background: transparent;
     border: none;
     cursor: pointer;
     font-family: inherit;
     color: var(--md-on-surface-variant);
-    padding: var(--sp-3) 0;
+    padding: var(--sp-2) 0;
   }
   .nav-indicator{
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    width: 56px;
-    height: 28px;
-    border-radius: var(--shape-full);
+    gap: 2px;
+    padding: var(--sp-1) var(--sp-3);
+    border-radius: var(--shape-lg);
     transition: background var(--motion-base) var(--motion-easing);
   }
   .nav-item.active .nav-indicator{ background: var(--md-secondary-container); }
   .nav-item.active .nav-indicator .material-symbols-outlined{ color: var(--md-on-secondary-container); }
-  .nav-item.active{ color: var(--md-on-surface); }
+  .nav-item.active .nav-indicator .nav-label{ color: var(--md-on-secondary-container); font-weight: 700; }
   .nav-item .material-symbols-outlined{ font-size: 22px; }
   .nav-label{
     font-size: var(--text-base);
@@ -625,20 +624,28 @@
 <nav class="nav-bar">
   <div class="nav-bar-inner">
     <button class="nav-item active" data-view="inicio" onclick="cambiarVista('inicio')">
-      <span class="nav-indicator"><span class="material-symbols-outlined">home</span></span>
-      <span class="nav-label">Inicio</span>
+      <span class="nav-indicator">
+        <span class="material-symbols-outlined">home</span>
+        <span class="nav-label">Inicio</span>
+      </span>
     </button>
     <button class="nav-item" data-view="productos" onclick="cambiarVista('productos')">
-      <span class="nav-indicator"><span class="material-symbols-outlined">receipt_long</span></span>
-      <span class="nav-label">Productos</span>
+      <span class="nav-indicator">
+        <span class="material-symbols-outlined">receipt_long</span>
+        <span class="nav-label">Productos</span>
+      </span>
     </button>
     <button class="nav-item" data-view="recetas" onclick="cambiarVista('recetas')">
-      <span class="nav-indicator"><span class="material-symbols-outlined">menu_book</span></span>
-      <span class="nav-label">Recetas</span>
+      <span class="nav-indicator">
+        <span class="material-symbols-outlined">menu_book</span>
+        <span class="nav-label">Recetas</span>
+      </span>
     </button>
     <button class="nav-item" data-view="ingredientes" onclick="cambiarVista('ingredientes')">
-      <span class="nav-indicator"><span class="material-symbols-outlined">inventory_2</span></span>
-      <span class="nav-label">Ingredientes</span>
+      <span class="nav-indicator">
+        <span class="material-symbols-outlined">inventory_2</span>
+        <span class="nav-label">Ingredientes</span>
+      </span>
     </button>
   </div>
 </nav>
